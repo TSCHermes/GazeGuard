@@ -262,17 +262,9 @@ if page == "🧪 Testing":
         with st.container(border=True):
             st.subheader("🌲 XGBoost")
 
-            xgb_label_str = "Correct" if xgb_pred == 1 else "Fooled"
+            xgb_pred_color = "#2E7D32" if xgb_pred == 1 else "#C62828"
+            xgb_actual_color = "#2E7D32" if true_label == "Correct" else "#C62828"
             xgb_match = (xgb_pred == 1 and true_label == "Correct") or (xgb_pred == 0 and true_label == "Fooled")
-            correct_card_color = "#1B5E20" if xgb_match else "#B71C1C"
-            correct_card_text = "✅ Correct Prediction" if xgb_match else "❌ Wrong Prediction"
-
-            st.markdown(f"""
-<div style="background:#1565C0;padding:1px 16px;border-radius:8px;margin-bottom:12px;">
-    <h4 style="color:white;margin:8px 0;">Prediction: {xgb_label_str}</h4>
-    <p style="color:#BBDEFB;margin:0;">Actual: {true_label} &nbsp;|&nbsp; {correct_card_text}</p>
-</div>
-""", unsafe_allow_html=True)
 
             st.markdown(f"""
 <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
@@ -284,25 +276,27 @@ if page == "🧪 Testing":
 <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
     <span>P(Correct)</span><span><b>{xgb_prob[1]:.1%}</b></span>
 </div>
-<div style="background:#E0E0E0;border-radius:4px;height:12px;">
+<div style="background:#E0E0E0;border-radius:4px;height:12px;margin-bottom:16px;">
     <div style="background:#4CAF50;width:{xgb_prob[1]*100:.0f}%;border-radius:4px;height:12px;"></div>
 </div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <span><b>Predicted</b></span>
+    <span style="background:{xgb_pred_color};color:white;padding:3px 12px;border-radius:12px;font-size:0.85em;font-weight:600;">{"Correct" if xgb_pred == 1 else "Fooled"}</span>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;">
+    <span><b>Actual</b></span>
+    <span style="background:{xgb_actual_color};color:white;padding:3px 12px;border-radius:12px;font-size:0.85em;font-weight:600;">{true_label}</span>
+</div>
+{'<div style="text-align:right;margin-top:6px;font-size:0.85em;">✅ Match</div>' if xgb_match else '<div style="text-align:right;margin-top:6px;font-size:0.85em;">❌ Wrong</div>'}
 """, unsafe_allow_html=True)
 
     with col_lr:
         with st.container(border=True):
             st.subheader("📈 Logistic Regression (L1)")
 
-            lr_label_str = "Correct" if lr_pred == 1 else "Fooled"
+            lr_pred_color = "#2E7D32" if lr_pred == 1 else "#C62828"
+            lr_actual_color = "#2E7D32" if true_label == "Correct" else "#C62828"
             lr_match = (lr_pred == 1 and true_label == "Correct") or (lr_pred == 0 and true_label == "Fooled")
-            lr_card_text = "✅ Correct Prediction" if lr_match else "❌ Wrong Prediction"
-
-            st.markdown(f"""
-<div style="background:#E65100;padding:1px 16px;border-radius:8px;margin-bottom:12px;">
-    <h4 style="color:white;margin:8px 0;">Prediction: {lr_label_str}</h4>
-    <p style="color:#FFE0B2;margin:0;">Actual: {true_label} &nbsp;|&nbsp; {lr_card_text}</p>
-</div>
-""", unsafe_allow_html=True)
 
             st.markdown(f"""
 <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
@@ -314,9 +308,18 @@ if page == "🧪 Testing":
 <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
     <span>P(Correct)</span><span><b>{lr_prob[1]:.1%}</b></span>
 </div>
-<div style="background:#E0E0E0;border-radius:4px;height:12px;">
+<div style="background:#E0E0E0;border-radius:4px;height:12px;margin-bottom:16px;">
     <div style="background:#4CAF50;width:{lr_prob[1]*100:.0f}%;border-radius:4px;height:12px;"></div>
 </div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <span><b>Predicted</b></span>
+    <span style="background:{lr_pred_color};color:white;padding:3px 12px;border-radius:12px;font-size:0.85em;font-weight:600;">{"Correct" if lr_pred == 1 else "Fooled"}</span>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;">
+    <span><b>Actual</b></span>
+    <span style="background:{lr_actual_color};color:white;padding:3px 12px;border-radius:12px;font-size:0.85em;font-weight:600;">{true_label}</span>
+</div>
+{'<div style="text-align:right;margin-top:6px;font-size:0.85em;">✅ Match</div>' if lr_match else '<div style="text-align:right;margin-top:6px;font-size:0.85em;">❌ Wrong</div>'}
 """, unsafe_allow_html=True)
 
     st.divider()
@@ -405,22 +408,19 @@ if page == "🧪 Testing":
         # Horizontal bar chart using st.bar_chart on a reshaped df
         chart_df = shap_plot_df.set_index("Feature")["SHAP Value"]
 
-        col_shap_chart, col_shap_table = st.columns([3, 2])
+        st.bar_chart(chart_df, color="#1565C0", horizontal=True)
 
-        with col_shap_chart:
-            st.bar_chart(chart_df, color="#1565C0", horizontal=True)
-
-        with col_shap_table:
-            table_rows = []
-            for _, r in shap_plot_df.iterrows():
-                direction = "→ Fooled" if r["SHAP Value"] < 0 else "→ Correct"
-                table_rows.append({
-                    "Feature": r["Feature"],
-                    "SHAP": f"{r['SHAP Value']:+.3f}",
-                    "Value": f"{r['Feature Value']:.1f}",
-                    "Direction": direction,
-                })
-            st.table(pd.DataFrame(table_rows))
+        st.markdown("**Top 15 Feature Contributions:**")
+        table_rows = []
+        for _, r in shap_plot_df.iterrows():
+            direction = "→ Fooled" if r["SHAP Value"] < 0 else "→ Correct"
+            table_rows.append({
+                "Feature": r["Feature"],
+                "SHAP": f"{r['SHAP Value']:+.3f}",
+                "Value": f"{r['Feature Value']:.1f}",
+                "Direction": direction,
+            })
+        st.table(pd.DataFrame(table_rows))
 
         st.caption(f"Base value (expected log-odds): {explainer.expected_value[idx] if isinstance(shap_vals, list) else explainer.expected_value:.3f} &nbsp;|&nbsp; Prediction: {xgb_label_str} (P={xgb_prob[xgb_pred]:.1%})")
     else:
