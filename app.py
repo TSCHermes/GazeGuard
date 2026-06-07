@@ -17,49 +17,24 @@ import pandas as pd
 import streamlit as st
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-def _resolve_project_dir():
-    """
-    Resolve the project root directory robustly across platforms.
-    Streamlit's __file__ can point to a cache dir on Windows, so we:
-    1. Try __file__'s real path (works on Linux / normal execution)
-    2. Fall back to cwd (works when running `streamlit run app.py` from project root)
-    3. Walk up from cwd looking for app.py
-    """
-    import inspect
-    # Try the actual source file location (most reliable)
-    try:
-        # inspect.stack() gives us the real file even through Streamlit's caching
-        frame = inspect.stack()[-1]  # bottom of stack = earliest call
-        caller_file = frame.filename
-        if os.path.isfile(caller_file):
-            return os.path.dirname(os.path.abspath(caller_file))
-    except Exception:
-        pass
-
-    # Try __file__ directly
-    try:
-        f = os.path.abspath(__file__)
-        if os.path.isfile(f):
-            return os.path.dirname(f)
-    except Exception:
-        pass
-
-    # Fallback: cwd (user runs `streamlit run app.py` from project root)
-    cwd = os.getcwd()
-    if os.path.isfile(os.path.join(cwd, "app.py")):
-        return cwd
-
-    # Last resort: walk up from cwd
-    parent = cwd
+# Resolve project root: we run `streamlit run app.py` from the project directory.
+# __file__ is unreliable under Streamlit (points to cache/temp dirs on Windows).
+# Strategy: use cwd, validate by checking for expected files, walk up if needed.
+_cwd = os.getcwd()
+if os.path.isdir(os.path.join(_cwd, "data")) and os.path.isdir(os.path.join(_cwd, "output")):
+    PROJECT_DIR = _cwd
+else:
+    # Walk up from cwd looking for the project root
+    PROJECT_DIR = _cwd
     for _ in range(5):
-        if os.path.isfile(os.path.join(parent, "app.py")):
-            return parent
-        parent = os.path.dirname(parent)
+        parent = os.path.dirname(PROJECT_DIR)
+        if os.path.isdir(os.path.join(parent, "data")) and os.path.isdir(os.path.join(parent, "output")):
+            PROJECT_DIR = parent
+            break
+        if parent == PROJECT_DIR:  # hit filesystem root
+            break
+        PROJECT_DIR = parent
 
-    return cwd
-
-
-PROJECT_DIR = _resolve_project_dir()
 DATA_DIR = os.path.join(PROJECT_DIR, "data")
 MODEL_DIR = os.path.join(PROJECT_DIR, "output")
 
@@ -186,12 +161,6 @@ with st.spinner("⏳ Loading models and data... (first load ~30s)"):
 trial_difficulty = data.groupby("Trial_num")["Response"].apply(
     lambda x: (x == "Correct").mean()
 ).to_dict()
-
-# Show resolved path in sidebar (collapsible, for debugging)
-with st.sidebar.expander("ℹ️ Debug: resolved paths", expanded=False):
-    st.text(f"Project: {PROJECT_DIR}")
-    st.text(f"Data:    {DATA_DIR}")
-    st.text(f"Models:  {MODEL_DIR}")
 
 # ── Sidebar ─────────────────────────────────────────────────────────────────
 st.sidebar.header("🔍 Select Trial")
