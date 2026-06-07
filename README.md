@@ -144,7 +144,9 @@ The per-trial gaze data was the key enabler — 6× more samples and 45× more m
 
 A web app lets you explore predictions interactively — select any participant-trial and see the model's prediction with explanations.
 
-![Streamlit App](figures/streamlit_screenshot.png)
+![Streamlit App 1](figures/streamlit1.png)
+![Streamlit App 2](figures/streamlit2.png)
+![Streamlit App 3](figures/streamlit3.png)
 
 ### Run locally
 
