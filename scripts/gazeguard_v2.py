@@ -29,6 +29,7 @@ from sklearn.metrics import (
 )
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
+import joblib
 
 warnings.filterwarnings("ignore")
 
@@ -504,6 +505,28 @@ with open(os.path.join(OUT_DIR, "metrics_report.txt"), "w") as f:
         f.write(f"  {feat:30s} {val:+.4f}  {direction}\n")
 
 print("Saved: metrics_report.txt")
+
+# ── 7. Save trained models with joblib ──────────────────────────────────────
+print("\n" + "=" * 60)
+print("STEP 7: Saving trained models")
+print("=" * 60)
+
+# Fit final models on ALL data
+print("Fitting final XGBoost on all data...")
+xgb_pipeline.fit(X, y)
+joblib.dump(xgb_pipeline, os.path.join(OUT_DIR, "xgboost_model.joblib"))
+print("Saved: xgb_model.joblib")
+
+print("Fitting final Logistic Regression on all data...")
+lr_pipeline.fit(X, y)
+joblib.dump(lr_pipeline, os.path.join(OUT_DIR, "logreg_model.joblib"))
+print("Saved: logreg_model.joblib")
+
+# Save feature column names for inference
+import json
+with open(os.path.join(OUT_DIR, "feature_columns.json"), "w") as f:
+    json.dump(feature_cols, f)
+print("Saved: feature_columns.json")
 
 print(f"\n{'='*60}")
 print(f"ALL DONE. Outputs in: {OUT_DIR}/")
