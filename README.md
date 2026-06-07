@@ -218,6 +218,6 @@ The script will:
 ## References
 
 - Itti, L., & Koch, C. (2001). Computational modelling of visual attention. *Nature Reviews Neuroscience*, 2(3), 194–203.
-- Sweller, J. (1988). Cognitive Load during Problem Solving. *Cognitive Science*, 12(2), 257–285.
+- Sweller, J. (1988). Cognitive Load during Problem Solving: Effects on Learning. *Cognitive Science*, 12(2), 257–285.
 - Green, D. M., & Swets, J. A. (1966). Signal Detection Theory and Psychophysics. Wiley.
-- Tobii AB. (2024). Tobii Pro Lab User Manual (v24.21).
+- Tobii AB. (2024). Tobii Pro Lab User Manual (Version 24.21).
