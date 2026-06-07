@@ -141,28 +141,54 @@ Counter-intuitively, more fixation on Mountain and Seed AOIs predicts being **fo
 
 The per-trial gaze data was the key enabler — 6× more samples and 45× more minority-class examples.
 
+## Interactive Demo (Streamlit)
+
+A web app lets you explore predictions interactively — select any participant-trial and see the model's prediction with explanations.
+
+![Streamlit App](figures/streamlit_screenshot.png)
+
+### Run locally
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+The app will open at `http://localhost:8501`. Select a participant and trial from the sidebar to see:
+
+- **Gaze data table**: per-AOI fixation durations for AI vs Real images
+- **Model predictions**: probability bars from both XGBoost and LogReg
+- **Explanation**: which gaze features push the prediction toward Correct or Fooled
+- **Model performance**: cross-validated metrics table
+
+> **Note:** First load takes ~30 seconds due to XGBoost model loading.
+
 ## Repository Structure
 
 ```
 CVApproachML/
 ├── README.md                    # This file
 ├── requirements.txt             # Python dependencies
+├── app.py                       # Streamlit interactive demo
 ├── .gitignore
 ├── data/
-│   ├── per_trial_fixation_data.csv    # Raw gaze data (87 participants × 6 trials)
-│   └── per_trial_response_labels.csv  # Per-trial Correct/Fooled labels
+│   ├── per_trial_fixation_data.csv
+│   └── per_trial_response_labels.csv
 ├── scripts/
-│   └── gazeguard_v2.py          # Full pipeline: features → models → evaluation
+│   └── gazeguard_v2.py          # Training pipeline (features → models → evaluation)
 ├── figures/
-│   ├── model_comparison.png     # Accuracy, balanced acc, recall + confusion matrices
-│   ├── feature_importance.png   # Top features from both models
-│   ├── per_trial_accuracy.png   # Trial difficulty visualization
-│   └── roc_curves.png           # ROC curves
+│   ├── model_comparison.png
+│   ├── feature_importance.png
+│   ├── per_trial_accuracy.png
+│   └── roc_curves.png
 └── output/
-    ├── metrics_report.txt       # Full numerical report
-    ├── feature_matrix.csv       # Engineered feature table (522 × 85)
-    ├── feature_importance.csv   # Ranked feature importances
-    └── cv_predictions.csv       # Per-trial cross-validated predictions
+    ├── metrics_report.txt
+    ├── feature_matrix.csv
+    ├── feature_importance.csv
+    ├── cv_predictions.csv
+    ├── xgboost_model.joblib      # Trained XGBoost model
+    ├── logreg_model.joblib       # Trained LogReg model
+    └── feature_columns.json      # Feature column spec for inference
 ```
 
 ## Reproducing Results
