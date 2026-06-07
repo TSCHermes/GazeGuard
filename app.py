@@ -388,9 +388,7 @@ if page == "🧪 Testing":
             explainer = _shap.TreeExplainer(xgb_raw)
             shap_vals = explainer.shap_values(X_scaled)
 
-        # Handle binary classification output (some xgb versions return list)
         if isinstance(shap_vals, list):
-            # class 0 = Fooled, class 1 = Correct; show the predicted class
             idx = xgb_pred
             sv = shap_vals[idx][0]
         else:
@@ -403,11 +401,8 @@ if page == "🧪 Testing":
         }).sort_values("SHAP Value", key=abs, ascending=False)
 
         shap_plot_df = shap_df.head(15).copy()
-        shap_plot_df["Color"] = shap_plot_df["SHAP Value"].apply(lambda x: "#F44336" if x < 0 else "#4CAF50")
 
-        # Horizontal bar chart using st.bar_chart on a reshaped df
         chart_df = shap_plot_df.set_index("Feature")["SHAP Value"]
-
         st.bar_chart(chart_df, color="#1565C0", horizontal=True)
 
         st.markdown("**Top 15 Feature Contributions:**")
@@ -422,10 +417,32 @@ if page == "🧪 Testing":
             })
         st.table(pd.DataFrame(table_rows))
 
-        st.caption(f"Base value (expected log-odds): {explainer.expected_value[idx] if isinstance(shap_vals, list) else explainer.expected_value:.3f} &nbsp;|&nbsp; Prediction: {xgb_label_str} (P={xgb_prob[xgb_pred]:.1%})")
+        xgb_label_str = "Correct" if xgb_pred == 1 else "Fooled"
+        base_val = explainer.expected_value[idx] if isinstance(shap_vals, list) else explainer.expected_value
+        st.caption(f"Base value (expected log-odds): {base_val:.3f} &nbsp;|&nbsp; Prediction: {xgb_label_str} (P={xgb_prob[xgb_pred]:.1%})")
     else:
         st.divider()
         st.info("💡 Install `shap` for per-trial SHAP waterfall charts: `pip install shap`")
+
+    # ── Gaze Heatmap ──────────────────────────────────────────────────────────
+    heatmap_base = os.path.join(PROJECT_DIR, "heatmap")
+    heatmap_path = None
+    # Try flat structure first: heatmap/P{ID}_trial{N}.png
+    flat_path = os.path.join(heatmap_base, f"P{selected_participant}_trial{selected_trial}.png")
+    if os.path.exists(flat_path):
+        heatmap_path = flat_path
+    else:
+        # Try TOI structure: heatmap/TOI_{N}/P{ID}_trial{N}.png
+        toi_path = os.path.join(heatmap_base, f"TOI_{selected_trial}", f"P{selected_participant}_trial{selected_trial}.png")
+        if os.path.exists(toi_path):
+            heatmap_path = toi_path
+
+    if heatmap_path:
+        st.divider()
+        st.subheader("🗺️ Gaze Heatmap")
+        st.image(heatmap_path, caption=f"P{selected_participant:02d} — Trial {selected_trial}", use_container_width=True)
+    else:
+        # Silently skip — heatmap not available for this trial
 
     st.divider()
     st.caption("GazeGuard v2 | WID2003 Cognitive Science | Tan Shan Chien | [GitHub](https://github.com/TSCHermes/GazeGuard)")
