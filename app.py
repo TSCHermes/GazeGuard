@@ -441,8 +441,6 @@ if page == "🧪 Testing":
         st.divider()
         st.subheader("🗺️ Gaze Heatmap")
         st.image(heatmap_path, caption=f"P{selected_participant:02d} — Trial {selected_trial}", use_container_width=True)
-    else:
-        # Silently skip — heatmap not available for this trial
 
     st.divider()
     st.caption("GazeGuard v2 | WID2003 Cognitive Science | Tan Shan Chien | [GitHub](https://github.com/TSCHermes/GazeGuard)")
