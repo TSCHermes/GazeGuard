@@ -1,7 +1,6 @@
 # GazeGuard — Predicting Human AI-Image Detection from Eye-Gaze Patterns
 
 **WID2003 Cognitive Science | Group Project: Eye Wonder**
-**Author:** Tan Shan Chien
 
 ## Overview
 

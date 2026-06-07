@@ -257,9 +257,9 @@ with col2:
     st.subheader("🌲 XGBoost")
 
     st.markdown(f"**P(Fooled): {xgb_prob[0]:.1%}**")
-    st.progress(xgb_prob[0])
+    st.progress(float(xgb_prob[0]))
     st.markdown(f"**P(Correct): {xgb_prob[1]:.1%}**")
-    st.progress(xgb_prob[1])
+    st.progress(float(xgb_prob[1]))
 
     st.markdown(f"**Prediction:** {'✅ Correct' if xgb_pred == 1 else '❌ Fooled'}")
     st.markdown(f"**Actual:** {'✅ Correct' if true_label == 'Correct' else '❌ Fooled'}")
@@ -270,9 +270,9 @@ with col3:
     st.subheader("📈 LogReg (L1)")
 
     st.markdown(f"**P(Fooled): {lr_prob[0]:.1%}**")
-    st.progress(lr_prob[0])
+    st.progress(float(lr_prob[0]))
     st.markdown(f"**P(Correct): {lr_prob[1]:.1%}**")
-    st.progress(lr_prob[1])
+    st.progress(float(lr_prob[1]))
 
     st.markdown(f"**Prediction:** {'✅ Correct' if lr_pred == 1 else '❌ Fooled'}")
     st.markdown(f"**Actual:** {'✅ Correct' if true_label == 'Correct' else '❌ Fooled'}")
