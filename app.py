@@ -45,15 +45,23 @@ def engineer_features_from_fixation(fd_trial, feature_cols, trial_difficulty_map
     Engineer the 82 features from raw fixation data for one trial.
     fd_trial: DataFrame with columns [AOI, ImageType, Duration_ms, Trial_num]
     """
+    # Pivot to wide: columns = (AOI, ImageType), values = Duration_ms
     pivot = fd_trial.pivot_table(
         columns=["AOI", "ImageType"],
         values="Duration_ms",
         aggfunc="sum",
     )
 
+    # Build a single-row dict, handling both Series and scalar values
     row = {}
-    for (aoi, img), val in pivot.items():
-        row[f"{aoi}_{img}"] = float(val) if not pd.isna(val) else 0.0
+    for key, val in pivot.items():
+        aoi, img = key
+        col_name = f"{aoi}_{img}"
+        # val may be a Series (multi-row pivot) or scalar (single-row)
+        if hasattr(val, "iloc"):
+            row[col_name] = float(val.iloc[0]) if len(val) > 0 and pd.notna(val.iloc[0]) else 0.0
+        else:
+            row[col_name] = float(val) if pd.notna(val) else 0.0
 
     df = pd.DataFrame([row])
 
@@ -88,12 +96,24 @@ def engineer_features_from_fixation(fd_trial, feature_cols, trial_difficulty_map
     ai_cols = [c for c in df.columns if c.endswith("_AI") and not c.endswith("_AIratio")]
     df["AI_Proportion"] = df[ai_cols].sum(axis=1) / (df["Total_Duration_All"] + 1)
 
-    df["Face_Total"] = df.get("Pupil_Total", 0).iloc[0] + df.get("Skin_Total", 0).iloc[0]
-    df["Face_AIratio"] = (df.get("Pupil_AI", 0).iloc[0] + df.get("Skin_AI", 0).iloc[0] + 1) / \
-                          (df.get("Pupil_Real", 0).iloc[0] + df.get("Skin_Real", 0).iloc[0] + 1)
-    df["Nature_Total"] = df.get("Cloud_Total", 0).iloc[0] + df.get("Water_Total", 0).iloc[0]
-    df["Nature_AIratio"] = (df.get("Cloud_AI", 0).iloc[0] + df.get("Water_AI", 0).iloc[0] + 1) / \
-                            (df.get("Cloud_Real", 0).iloc[0] + df.get("Water_Real", 0).iloc[0] + 1)
+    # Cross-AOI composites — use .values[0] for scalar extraction from single-row df
+    pupil_total = df["Pupil_Total"].values[0] if "Pupil_Total" in df else 0.0
+    skin_total = df["Skin_Total"].values[0] if "Skin_Total" in df else 0.0
+    df["Face_Total"] = pupil_total + skin_total
+    pupil_ai = df["Pupil_AI"].values[0] if "Pupil_AI" in df else 0.0
+    skin_ai = df["Skin_AI"].values[0] if "Skin_AI" in df else 0.0
+    pupil_real = df["Pupil_Real"].values[0] if "Pupil_Real" in df else 0.0
+    skin_real = df["Skin_Real"].values[0] if "Skin_Real" in df else 0.0
+    df["Face_AIratio"] = (pupil_ai + skin_ai + 1) / (pupil_real + skin_real + 1)
+
+    cloud_total = df["Cloud_Total"].values[0] if "Cloud_Total" in df else 0.0
+    water_total = df["Water_Total"].values[0] if "Water_Total" in df else 0.0
+    df["Nature_Total"] = cloud_total + water_total
+    cloud_ai = df["Cloud_AI"].values[0] if "Cloud_AI" in df else 0.0
+    water_ai = df["Water_AI"].values[0] if "Water_AI" in df else 0.0
+    cloud_real = df["Cloud_Real"].values[0] if "Cloud_Real" in df else 0.0
+    water_real = df["Water_Real"].values[0] if "Water_Real" in df else 0.0
+    df["Nature_AIratio"] = (cloud_ai + water_ai + 1) / (cloud_real + water_real + 1)
 
     trial_num = int(fd_trial["Trial_num"].iloc[0]) if "Trial_num" in fd_trial.columns else 1
     df["Trial_Accuracy_Rate"] = trial_difficulty_map.get(trial_num, 0.65)
@@ -270,12 +290,12 @@ ec1, ec2 = st.columns(2)
 with ec1:
     st.markdown("**Pushing → ✅ Correct:**")
     for feat, coef in lr_coef.nlargest(5).items():
-        val = X_trial[feat].iloc[0]
+        val = X_trial[feat].values[0]
         st.markdown(f"- `{feat}` = **{val:.1f}** (coef +{coef:.3f})")
 with ec2:
     st.markdown("**Pushing → ❌ Fooled:**")
     for feat, coef in lr_coef.nsmallest(5).items():
-        val = X_trial[feat].iloc[0]
+        val = X_trial[feat].values[0]
         st.markdown(f"- `{feat}` = **{val:.1f}** (coef {coef:.3f})")
 
 # ── Performance table ───────────────────────────────────────────────────────
