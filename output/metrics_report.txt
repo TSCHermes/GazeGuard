@@ -1,0 +1,157 @@
+GazeGuard v2 — Per-Trial Prediction Report
+============================================================
+
+Dataset: 522 trials × 82 features
+Participants: 87
+Class balance: {'Correct': np.int64(339), 'Fooled': np.int64(183)}
+CV: 5-fold StratifiedGroupKFold (grouped by participant)
+
+
+==================================================
+MODEL: XGBoost
+==================================================
+Raw accuracy        : 0.860
+Balanced accuracy   : 0.827
+Recall (Correct)    : 0.938
+Recall (Fooled)     : 0.716
+F1 (Fooled)         : 0.782
+ROC-AUC             : 0.923
+Avg Precision       : 0.953
+Confusion matrix:
+[[318  21]
+ [ 52 131]]
+
+==================================================
+MODEL: Logistic Regression (L1)
+==================================================
+Raw accuracy        : 0.860
+Balanced accuracy   : 0.855
+Recall (Correct)    : 0.873
+Recall (Fooled)     : 0.836
+F1 (Fooled)         : 0.807
+ROC-AUC             : 0.913
+Avg Precision       : 0.938
+Confusion matrix:
+[[296  43]
+ [ 30 153]]
+
+
+Top 15 XGBoost features:
+  Hair_Total                     0.1116
+  Trial_Accuracy_Rate            0.0923
+  Nature_AIratio                 0.0676
+  Cloud_Real                     0.0517
+  Water_Total                    0.0432
+  Hair_AI                        0.0409
+  Cloud_AI                       0.0403
+  Water_AbsDiff                  0.0384
+  Water_Real                     0.0358
+  Water_AI                       0.0305
+  Cloud_Total                    0.0282
+  Topping2_Realratio             0.0249
+  Water_AIratio                  0.0240
+  Topping2_AIratio               0.0236
+  Topping2_Real                  0.0226
+
+
+Top 15 LR features (|coef|):
+  Trial_Accuracy_Rate            4.4062
+  River_AbsDiff                  1.1703
+  Mountain_AI                    0.9088
+  Leaves_Realratio               0.8478
+  Leaves_AbsDiff                 0.8144
+  River_AI                       0.8027
+  Leaves_AIratio                 0.6742
+  Topping2_Realratio             0.5782
+  Hair_AI                        0.5352
+  Mountain_Total                 0.5286
+  Outfit_Realratio               0.4482
+  Cloud_AI                       0.4471
+  River_Total                    0.4165
+  Nature_AIratio                 0.4119
+  Seed_Total                     0.4044
+
+
+LR signed coefficients (direction):
+  Mountain_AI                    -0.9088  → Fooled
+  Mountain_Total                 -0.5286  → Fooled
+  Seed_Total                     -0.4044  → Fooled
+  Mountain_Realratio             -0.3892  → Fooled
+  Seed_AI                        -0.3603  → Fooled
+  Seed_Real                      -0.3410  → Fooled
+  Seed_Realratio                 -0.3298  → Fooled
+  Hair_AIratio                   -0.2941  → Fooled
+  Mountain_Real                  -0.2710  → Fooled
+  Topping1_Real                  -0.2476  → Fooled
+  Topping1_Realratio             -0.1867  → Fooled
+  Water_AIratio                  -0.1381  → Fooled
+  Topping1_Total                 -0.1223  → Fooled
+  Outfit_Real                    -0.1136  → Fooled
+  Water_Total                    -0.0877  → Fooled
+  Topping1_AI                    -0.0851  → Fooled
+  Water_AI                       -0.0755  → Fooled
+  Topping1_AIratio               -0.0735  → Fooled
+  Water_Real                     -0.0634  → Fooled
+  AI_Proportion                  -0.0459  → Fooled
+  Outfit_Total                   -0.0399  → Fooled
+  Water_Realratio                -0.0341  → Fooled
+  Cloud_Realratio                -0.0058  → Fooled
+  Skin_Real                      +0.0000  → Fooled
+  Topping2_AI                    +0.0000  → Fooled
+  Topping2_Real                  +0.0000  → Fooled
+  Hair_Realratio                 +0.0000  → Fooled
+  Skin_AI                        +0.0000  → Fooled
+  Leaves_Total                   +0.0000  → Fooled
+  Skin_AIratio                   +0.0000  → Fooled
+  Pupil_Realratio                +0.0000  → Fooled
+  Pupil_AbsDiff                  +0.0000  → Fooled
+  Skin_Total                     +0.0000  → Fooled
+  Skin_AbsDiff                   +0.0000  → Fooled
+  Skin_Realratio                 +0.0000  → Fooled
+  Topping1_AbsDiff               +0.0000  → Fooled
+  River_AIratio                  +0.0000  → Fooled
+  Seed_AbsDiff                   +0.0000  → Fooled
+  Outfit_AIratio                 +0.0000  → Fooled
+  Mountain_AbsDiff               +0.0000  → Fooled
+  Pupil_AIratio                  +0.0000  → Fooled
+  Outfit_AbsDiff                 +0.0000  → Fooled
+  Std_AOI_Duration               +0.0000  → Fooled
+  Num_AOIs_Fixated               +0.0000  → Fooled
+  Pupil_Real                     +0.0000  → Fooled
+  Outfit_AI                      +0.0000  → Fooled
+  Leaves_Real                    +0.0000  → Fooled
+  River_Real                     +0.0000  → Fooled
+  Topping2_Total                 +0.0000  → Fooled
+  Total_Duration_All             +0.0000  → Fooled
+  Face_AIratio                   +0.0000  → Fooled
+  Nature_Total                   +0.0000  → Fooled
+  Pupil_AI                       +0.0003  → Correct
+  Pupil_Total                    +0.0239  → Correct
+  Leaves_AI                      +0.0245  → Correct
+  Face_Total                     +0.0322  → Correct
+  Cloud_AbsDiff                  +0.0672  → Correct
+  Hair_Real                      +0.0672  → Correct
+  River_Realratio                +0.0897  → Correct
+  Hair_AbsDiff                   +0.1234  → Correct
+  Cloud_Real                     +0.1456  → Correct
+  Water_AbsDiff                  +0.1475  → Correct
+  Topping2_AIratio               +0.1532  → Correct
+  Cloud_Total                    +0.2208  → Correct
+  Mountain_AIratio               +0.2282  → Correct
+  Seed_AIratio                   +0.2547  → Correct
+  Hair_Total                     +0.2914  → Correct
+  Max_AOI_Duration               +0.2973  → Correct
+  Cloud_AIratio                  +0.3529  → Correct
+  Topping2_AbsDiff               +0.3790  → Correct
+  Nature_AIratio                 +0.4119  → Correct
+  River_Total                    +0.4165  → Correct
+  Cloud_AI                       +0.4471  → Correct
+  Outfit_Realratio               +0.4482  → Correct
+  Hair_AI                        +0.5352  → Correct
+  Topping2_Realratio             +0.5782  → Correct
+  Leaves_AIratio                 +0.6742  → Correct
+  River_AI                       +0.8027  → Correct
+  Leaves_AbsDiff                 +0.8144  → Correct
+  Leaves_Realratio               +0.8478  → Correct
+  River_AbsDiff                  +1.1703  → Correct
+  Trial_Accuracy_Rate            +4.4062  → Correct
